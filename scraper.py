@@ -9,7 +9,7 @@ companies = ['AAPL', 'BRK-A', 'META', 'MSFT', 'NVDA', 'TSLA']
 now = datetime.now()
 
 # Open or create the CSV file in append mode
-with open('stock_data.csv', 'a') as f:
+with open('/tmp/stock_data.csv', 'a') as f:
     for company in companies:
         try:
             # Download stock data
