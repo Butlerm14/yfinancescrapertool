@@ -1,30 +1,29 @@
 import yfinance as yf
 import pandas as pd
-import datetime
+from datetime import datetime
 
-def scrape_data():
-    # define the companies we want to scrape
-    tickers = ["AAPL", "BRK-A", "META", "MSFT", "NVDA", "TSLA"]
-    data = pd.DataFrame()
+# List of companies to scrape data for
+companies = ['AAPL', 'BRK-A', 'META', 'MSFT', 'NVDA', 'TSLA']
 
-    for ticker in tickers:
+# Get current timestamp
+now = datetime.now()
+
+# Open or create the CSV file in append mode
+with open('stock_data.csv', 'a') as f:
+    for company in companies:
         try:
-            stock = yf.Ticker(ticker)
-            # get the historical market data
-            hist = stock.history(period="1d") # Fetching data for 1 day
-            hist['Ticker'] = ticker  # add this column because it doesn't exist in the original data
-            data = data.append(hist)
+            # Download stock data
+            data = yf.download(company, start='2023-01-01', end=now.strftime('%Y-%m-%d'))
+
+            # Add timestamp and company columns
+            data['timestamp'] = now
+            data['company'] = company
+
+            # Write data to CSV
+            data.to_csv(f, header=f.tell()==0)
+            
         except Exception as e:
-            print(f"An error occurred while fetching data for {ticker}: {str(e)}")
+            print(f"An error occurred while fetching data for {company}: {e}")
 
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data['Timestamp'] = timestamp  # add a consistent timestamp to the data
-    return data
+print("Data fetching completed.")
 
-def save_to_csv():
-    data = scrape_data()
-    # save the data to a csv file
-    data.to_csv('stock_data.csv', mode='a')  # 'a' mode will append the data
-
-if __name__ == "__main__":
-    save_to_csv()
